@@ -1,49 +1,65 @@
 package service;
 
+import model.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import model.Produto;
 
 public class EstoqueService {
     private List<Produto> produtos = new ArrayList<>();
-
-    public void cadastrarProduto(Produto produto) {
-        if (produto.validar()) {
-            produtos.add(produto);
-        } else {
-            System.out.println("Produto inválido!");
-        }
+    private List<Categoria> categorias = new ArrayList<>();
+    private List<Fornecedor> fornecedores = new ArrayList<>();
+    private List<EntradaEstoque> entradas = new ArrayList<>();
+    private List<SaidaEstoque> saidas = new ArrayList<>();
+    
+    // Categoria
+    public void adicionarCategoria(Categoria c) { categorias.add(c); }
+    public void removerCategoria(int id) { categorias.removeIf(c -> c.getId() == id); }
+    public Categoria buscarCategoria(int id) {
+        for (Categoria c : categorias) if (c.getId() == id) return c;
+        return null;
     }
+    public List<Categoria> listarCategorias() { return categorias; }
 
-    public void entradaProduto(int id, int quantidade) throws Exception {
-        Produto p = buscarProduto(id);
-        if (p != null) p.adicionarEstoque(quantidade);
+    // Fornecedor
+    public void adicionarFornecedor(Fornecedor f) { fornecedores.add(f); }
+    public void removerFornecedor(int id) { fornecedores.removeIf(f -> f.getId() == id); }
+    public Fornecedor buscarFornecedor(int id) {
+        for (Fornecedor f : fornecedores) if (f.getId() == id) return f;
+        return null;
     }
+    public List<Fornecedor> listarFornecedores() { return fornecedores; }
 
-    public void saidaProduto(int id, int quantidade) throws Exception {
-        Produto p = buscarProduto(id);
-        if (p != null) p.removerEstoque(quantidade);
-    }
-
+    // Produto
+    public void adicionarProduto(Produto p) { produtos.add(p); }
+    public void removerProduto(int id) { produtos.removeIf(p -> p.getId() == id); }
     public Produto buscarProduto(int id) {
-        return produtos.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
+        for (Produto p : produtos) if (p.getId() == id) return p;
+        return null;
     }
-
     public List<Produto> listarProdutos() { return produtos; }
 
+    public void aumentarEstoque(int produtoId, int qtd, Fornecedor fornecedor) {
+        Produto p = buscarProduto(produtoId);
+        if (p == null) throw new IllegalArgumentException("Produto não encontrado");
+        p.aumentarEstoque(qtd);
+        // registra entrada
+        entradas.add(new EntradaEstoque(new Date(), p, qtd, fornecedor));
+        // vincula fornecedor ao produto (Fornecimento)
+        if (fornecedor != null) p.adicionarFornecedor(new Fornecimento(p, fornecedor));
+    }
+
+    public void diminuirEstoque(int produtoId, int qtd, Fornecedor fornecedor) {
+        Produto p = buscarProduto(produtoId);
+        if (p == null) throw new IllegalArgumentException("Produto não encontrado");
+        p.diminuirEstoque(qtd);
+        saidas.add(new SaidaEstoque(new Date(), p, qtd, fornecedor));
+    }
+
     public List<Produto> listarEstoqueBaixo() {
-        List<Produto> alerta = new ArrayList<>();
-        for (Produto p : produtos) {
-            if (p.precisaReposicao()) alerta.add(p);
-        }
-        return alerta;
+        List<Produto> res = new ArrayList<>();
+        for (Produto p : produtos) if (p.verificarEstoqueMinimo()) res.add(p);
+        return res;
     }
 
-    public List<Produto> getProdutos() {
-        return produtos;
-    }
-
-    public void setProdutos(List<Produto> produtos) {
-        this.produtos = produtos;
-    }
 }

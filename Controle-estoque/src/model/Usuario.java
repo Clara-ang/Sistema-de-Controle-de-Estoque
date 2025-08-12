@@ -1,7 +1,7 @@
 package model;
 
-public abstract class Usuario{
-    private int id;
+public abstract class Usuario {
+    protected int id;
 
     public Usuario(int id) {
         this.id = id;

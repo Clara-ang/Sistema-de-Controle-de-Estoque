@@ -2,32 +2,27 @@ package model;
 
 public class Fornecedor extends Usuario {
     private String nome;
-    private String email;
+    private String cnpj;
+    private String contato;
 
-    public Fornecedor(int id, String nome, String email) {
+    public Fornecedor(int id, String nome, String cnpj, String contato) {
         super(id);
         this.nome = nome;
-        this.email = email;
+        this.cnpj = cnpj;
+        this.contato = contato;
     }
 
-    public String getNome() { 
-        return nome; 
-    }
-    public void setNome(String nome) { 
-        this.nome = nome; 
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getEmail() { 
-        return email; 
-    }
-    public void setEmail(String email) { 
-        this.email = email; 
-    }
+    public String getCnpj() { return cnpj; }
+    public void setCnpj(String cnpj) { this.cnpj = cnpj; }
+
+    public String getContato() { return contato; }
+    public void setContato(String contato) { this.contato = contato; }
 
     @Override
     public String toString() {
-        return "Fornecedor: " + nome + " | Email: " + email;
+        return id + " - " + nome + " | CNPJ: " + cnpj + " | Contato: " + contato;
     }
 }
-
-

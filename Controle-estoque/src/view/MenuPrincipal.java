@@ -1,6 +1,5 @@
 package view;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import model.*;
@@ -10,154 +9,143 @@ public class MenuPrincipal {
     public static void iniciar() {
         Scanner sc = new Scanner(System.in);
         EstoqueService estoque = new EstoqueService();
-        List<Categoria> categorias = new ArrayList<>();
-        List<Fornecedor> fornecedores = new ArrayList<>();
 
         while (true) {
-            System.out.println("\n=== MENU ESTOQUE ===");
+            System.out.println("\n=== SISTEMA DE ESTOQUE ===");
             System.out.println("1 - Cadastrar Categoria");
             System.out.println("2 - Cadastrar Fornecedor");
             System.out.println("3 - Cadastrar Produto");
-            System.out.println("4 - Entrada de Produto");
-            System.out.println("5 - Saída de Produto");
+            System.out.println("4 - Entrada de Estoque (compras)");
+            System.out.println("5 - Saída de Estoque (venda/uso)");
             System.out.println("6 - Listar Produtos");
-            System.out.println("7 - Estoque Baixo");
-            System.out.println("8 - Editar Categoria/Fornecedor de Produto");
+            System.out.println("7 - Listar Estoque Baixo");
+            System.out.println("8 - Editar Produto (categoria/fornecedor/preço)");
+            System.out.println("9 - Listar Movimentações (entradas/saídas)");
+            System.out.println("10 - Cadastrar Cliente");
+            System.out.println("11 - Cadastrar Funcionário");
             System.out.println("0 - Sair");
             System.out.print("Opção: ");
-            int op = sc.nextInt();
+            int op = Integer.parseInt(sc.nextLine());
 
             try {
-                if (op == 0) break;
                 switch (op) {
+                    case 0: return;
+
                     case 1:
-                        System.out.print("ID Categoria: ");
-                        int idC = sc.nextInt();
-                        sc.nextLine();
-                        System.out.print("Nome Categoria: ");
-                        String nomeC = sc.nextLine();
-                        categorias.add(new Categoria(idC, nomeC));
-                        System.out.println("Categoria cadastrada com sucesso!");
+                        System.out.print("ID Categoria: "); int idC = Integer.parseInt(sc.nextLine());
+                        System.out.print("Nome Categoria: "); String nomeC = sc.nextLine();
+                        System.out.print("Descrição (opcional): "); String desc = sc.nextLine();
+                        estoque.adicionarCategoria(new Categoria(idC, nomeC, desc));
+                        System.out.println("Categoria cadastrada.");
                         break;
 
                     case 2:
-                        System.out.print("ID Fornecedor: ");
-                        int idF = sc.nextInt();
-                        sc.nextLine();
-                        System.out.print("Nome Fornecedor: ");
-                        String nomeF = sc.nextLine();
-                        System.out.print("Email Fornecedor: ");
-                        String emailF = sc.nextLine();
-                        fornecedores.add(new Fornecedor(idF, nomeF, emailF));
-                        System.out.println("Fornecedor cadastrado com sucesso!");
+                        System.out.print("ID Fornecedor: "); int idF = Integer.parseInt(sc.nextLine());
+                        System.out.print("Nome Fornecedor: "); String nomeF = sc.nextLine();
+                        System.out.print("CNPJ: "); String cnpjF = sc.nextLine();
+                        System.out.print("Contato (email/telefone): "); String cont = sc.nextLine();
+                        estoque.adicionarFornecedor(new Fornecedor(idF, nomeF, cnpjF, cont));
+                        System.out.println("Fornecedor cadastrado.");
                         break;
 
                     case 3:
-                        if (categorias.isEmpty() || fornecedores.isEmpty()) {
-                            System.out.println("Cadastre pelo menos 1 categoria e 1 fornecedor antes de cadastrar um produto!");
+                        if (estoque.listarCategorias().isEmpty() || estoque.listarFornecedores().isEmpty()) {
+                            System.out.println("Cadastre pelo menos 1 categoria e 1 fornecedor antes.");
                             break;
                         }
-                        System.out.print("ID Produto: ");
-                        int idP = sc.nextInt();
-                        sc.nextLine();
-                        System.out.print("Nome Produto: ");
-                        String nomeP = sc.nextLine();
-                        System.out.print("Quantidade inicial: ");
-                        int qtd = sc.nextInt();
-                        System.out.print("Estoque mínimo: ");
-                        int min = sc.nextInt();
+                        System.out.print("ID Produto: "); int idP = Integer.parseInt(sc.nextLine());
+                        System.out.print("Nome Produto: "); String nomeP = sc.nextLine();
+                        System.out.print("Preço Compra: "); double pc = Double.parseDouble(sc.nextLine());
+                        System.out.print("Preço Venda: "); double pv = Double.parseDouble(sc.nextLine());
+                        System.out.print("Estoque inicial: "); int est = Integer.parseInt(sc.nextLine());
+                        System.out.print("Estoque mínimo: "); int min = Integer.parseInt(sc.nextLine());
 
-                        System.out.println("Escolha a Categoria:");
-                        for (Categoria c : categorias) {
-                            System.out.println(c.getId() + " - " + c.getNome());
+                        System.out.println("Categorias:");
+                        for (Categoria c : estoque.listarCategorias()) System.out.println(c.getId() + " - " + c.getNome());
+                        System.out.print("ID categoria: "); int idCat = Integer.parseInt(sc.nextLine());
+                        Categoria cat = estoque.buscarCategoria(idCat);
+
+                        Produto p = new Produto(idP, nomeP, pc, pv, est, min, cat);
+                        // associar um fornecedor padrão (opcional)
+                        System.out.println("Fornecedores:");
+                        for (Fornecedor f : estoque.listarFornecedores()) System.out.println(f.getId() + " - " + f.getNome());
+                        System.out.print("ID fornecedor padrão (ou 0 p/nenhum): ");
+                        int idFor = Integer.parseInt(sc.nextLine());
+                        if (idFor != 0) {
+                            Fornecedor fornec = estoque.buscarFornecedor(idFor);
+                            if (fornec != null) p.adicionarFornecedor(new Fornecimento(p, fornec));
                         }
-                        int idCatEscolhida = sc.nextInt();
-                        Categoria catEscolhida = categorias.stream()
-                                .filter(c -> c.getId() == idCatEscolhida)
-                                .findFirst().orElse(null);
 
-                        System.out.println("Escolha o Fornecedor:");
-                        for (Fornecedor f : fornecedores) {
-                            System.out.println(f.getId() + " - " + f.getNome());
-                        }
-                        int idForEscolhido = sc.nextInt();
-                        Fornecedor forEscolhido = fornecedores.stream()
-                                .filter(f -> f.getId() == idForEscolhido)
-                                .findFirst().orElse(null);
-
-                        Produto novoProduto = new Produto(idP, nomeP, catEscolhida, forEscolhido, qtd, min);
-                        estoque.cadastrarProduto(novoProduto);
-                        System.out.println("Produto cadastrado com sucesso!");
+                        estoque.adicionarProduto(p);
+                        System.out.println("Produto cadastrado.");
                         break;
 
                     case 4:
-                        System.out.print("ID Produto: ");
-                        int idEntrada = sc.nextInt();
-                        System.out.print("Qtd: ");
-                        int qtdE = sc.nextInt();
-                        estoque.entradaProduto(idEntrada, qtdE);
+                        System.out.print("ID Produto (entrada): "); int idEnt = Integer.parseInt(sc.nextLine());
+                        System.out.print("Quantidade: "); int qtdEnt = Integer.parseInt(sc.nextLine());
+                        System.out.print("ID Fornecedor: "); int idForE = Integer.parseInt(sc.nextLine());
+                        Fornecedor fEnt = estoque.buscarFornecedor(idForE);
+                        estoque.aumentarEstoque(idEnt, qtdEnt, fEnt);
                         System.out.println("Entrada registrada.");
                         break;
 
                     case 5:
-                        System.out.print("ID Produto: ");
-                        int idSaida = sc.nextInt();
-                        System.out.print("Qtd: ");
-                        int qtdS = sc.nextInt();
-                        estoque.saidaProduto(idSaida, qtdS);
+                        System.out.print("ID Produto (saída): "); int idSai = Integer.parseInt(sc.nextLine());
+                        System.out.print("Quantidade: "); int qtdSai = Integer.parseInt(sc.nextLine());
+                        System.out.print("ID Fornecedor (opcional, 0 se não): "); int idForS = Integer.parseInt(sc.nextLine());
+                        Fornecedor fSai = idForS == 0 ? null : estoque.buscarFornecedor(idForS);
+                        estoque.diminuirEstoque(idSai, qtdSai, fSai);
                         System.out.println("Saída registrada.");
                         break;
 
                     case 6:
-                        estoque.listarProdutos().forEach(System.out::println);
+                        List<Produto> lista = estoque.listarProdutos();
+                        if (lista.isEmpty()) System.out.println("Nenhum produto cadastrado.");
+                        else for (Produto prod : lista) System.out.println(prod);
                         break;
 
                     case 7:
-                        List<Produto> alerta = estoque.listarEstoqueBaixo();
-                        if (alerta.isEmpty()) {
-                            System.out.println("Nenhum produto com estoque baixo.");
-                        } else {
-                            alerta.forEach(System.out::println);
-                        }
+                        List<Produto> baixos = estoque.listarEstoqueBaixo();
+                        if (baixos.isEmpty()) System.out.println("Nenhum produto com estoque baixo.");
+                        else for (Produto bp : baixos) bp.mostrarDetalhes();
                         break;
 
                     case 8:
-                        System.out.print("ID Produto para editar: ");
-                        int idEdit = sc.nextInt();
-                        Produto prodEdit = estoque.buscarProduto(idEdit);
-                        if (prodEdit == null) {
-                            System.out.println("Produto não encontrado!");
-                            break;
-                        }
+                        System.out.print("ID Produto a editar: "); int idEd = Integer.parseInt(sc.nextLine());
+                        Produto prodEd = estoque.buscarProduto(idEd);
+                        if (prodEd == null) { System.out.println("Produto não encontrado."); break; }
 
-                        System.out.println("Editar Categoria:");
-                        for (Categoria c : categorias) {
-                            System.out.println(c.getId() + " - " + c.getNome());
+                        System.out.println("1- mudar categoria  2- adicionar fornecedor  3- atualizar preço");
+                        int sub = Integer.parseInt(sc.nextLine());
+                        if (sub == 1) {
+                            System.out.println("Categorias:");
+                            for (Categoria c2 : estoque.listarCategorias()) System.out.println(c2.getId() + " - " + c2.getNome());
+                            System.out.print("ID nova categoria: "); int idNc = Integer.parseInt(sc.nextLine());
+                            Categoria nc = estoque.buscarCategoria(idNc);
+                            prodEd.setCategoria(nc);
+                            System.out.println("Categoria atualizada.");
+                        } else if (sub == 2) {
+                            System.out.println("Fornecedores:");
+                            for (Fornecedor ff : estoque.listarFornecedores()) System.out.println(ff.getId() + " - " + ff.getNome());
+                            System.out.print("ID fornecedor a adicionar: "); int idAf = Integer.parseInt(sc.nextLine());
+                            Fornecedor af = estoque.buscarFornecedor(idAf);
+                            if (af != null) prodEd.adicionarFornecedor(new Fornecimento(prodEd, af));
+                            System.out.println("Fornecedor associado.");
+                        } else if (sub == 3) {
+                            System.out.print("Novo preço de venda: "); double novo = Double.parseDouble(sc.nextLine());
+                            prodEd.atualizarPreco(novo);
+                            System.out.println("Preço atualizado.");
+                        } else {
+                            System.out.println("Opção inválida.");
                         }
-                        int idNovaCat = sc.nextInt();
-                        Categoria novaCat = categorias.stream()
-                                .filter(c -> c.getId() == idNovaCat)
-                                .findFirst().orElse(null);
-                        prodEdit.setCategoria(novaCat);
-
-                        System.out.println("Editar Fornecedor:");
-                        for (Fornecedor f : fornecedores) {
-                            System.out.println(f.getId() + " - " + f.getNome());
-                        }
-                        int idNovoFor = sc.nextInt();
-                        Fornecedor novoFor = fornecedores.stream()
-                                .filter(f -> f.getId() == idNovoFor)
-                                .findFirst().orElse(null);
-                        prodEdit.setFornecedor(novoFor);
-
-                        System.out.println("Produto atualizado!");
                         break;
 
+
                     default:
-                        System.out.println("Opção inválida!");
+                        System.out.println("Opção inválida.");
                 }
-            } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
+            }catch (Exception e) {
+                System.out.println("ERRO: " + e.getMessage());
             }
         }
     }
