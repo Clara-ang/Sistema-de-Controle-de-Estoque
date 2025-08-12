@@ -2,7 +2,11 @@ package view;
 
 import java.util.List;
 import java.util.Scanner;
-import model.*;
+
+import model.Categoria;
+import model.Fornecedor;
+import model.Fornecimento;
+import model.Produto;
 import service.EstoqueService;
 
 public class MenuPrincipal {
@@ -20,9 +24,6 @@ public class MenuPrincipal {
             System.out.println("6 - Listar Produtos");
             System.out.println("7 - Listar Estoque Baixo");
             System.out.println("8 - Editar Produto (categoria/fornecedor/preço)");
-            System.out.println("9 - Listar Movimentações (entradas/saídas)");
-            System.out.println("10 - Cadastrar Cliente");
-            System.out.println("11 - Cadastrar Funcionário");
             System.out.println("0 - Sair");
             System.out.print("Opção: ");
             int op = Integer.parseInt(sc.nextLine());
