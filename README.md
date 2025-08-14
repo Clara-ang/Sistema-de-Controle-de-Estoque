@@ -5,6 +5,14 @@
 
 ### Especificação ###
 
+- Entrar nas pastas: 
+   cd Controle-de-estoque
+   cd src 
+- Para compilar:
+   javac -d ../bin -sourcepath . -cp ../bin -encoding UTF-8 model/*.java service/*.java view/*.java
+- Para rodar:
+   java -cp ../bin view.Main    
+
 #### 1. **Requisitos Funcionais**:
    - O sistema deve permitir o **cadastro, edição, exclusão e consulta** das entidades principais (ex: livros, usuários, produtos, etc.).
    - Deve haver funcionalidades específicas para o domínio do sistema (ex: empréstimo de livros, fechamento de pedidos, agendamento de consultas, etc.).
