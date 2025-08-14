@@ -1,28 +1,31 @@
 package model;
 
 import java.util.Date;
+//import model.MovimentoEstoque;
+//import model.Produto;
+//import model.Fornecedor;
 
-public class EntradaEstoque {
-    private Date data;
-    private Produto produto;
-    private int quantidade;
+public class EntradaEstoque extends MovimentoEstoque {
+    // Atributo específico para entrada
     private Fornecedor fornecedor;
 
-    public EntradaEstoque(Date data, Produto produto, int quantidade, Fornecedor fornecedor) {
-        this.data = data;
-        this.produto = produto;
-        this.quantidade = quantidade;
+    public EntradaEstoque(int id, Date data, Produto produto, int quantidade, Fornecedor fornecedor) {
+        super(id, data, produto, quantidade); // Chama o construtor da classe-mãe
         this.fornecedor = fornecedor;
     }
 
-    public Date getData() { return data; }
-    public Produto getProduto() { return produto; }
-    public int getQuantidade() { return quantidade; }
-    public Fornecedor getFornecedor() { return fornecedor; }
-
+    // Implementação do método abstrato
     @Override
-    public String toString() {
-        return "EntradaEstoque{data=" + data + ", produtoId=" + (produto != null ? produto.getId() : "N/A")
-                + ", qtd=" + quantidade + ", fornecedor=" + (fornecedor != null ? fornecedor.getNome() : "N/A") + "}";
+    public void processarMovimento() {
+        System.out.println("Processando entrada do produto " + getProduto().getNome());
+        getProduto().aumentarEstoque(getQuantidade());
+        System.out.println("Estoque atualizado para " + getProduto().getEstoqueAtual());
+    }
+
+    // Getter específico
+    public Fornecedor getFornecedor() {
+        return fornecedor;
     }
 }
+
+
