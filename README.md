@@ -3,7 +3,7 @@
    - Controle de entrada e saída de produtos.
    - Alertas de estoque mínimo.
 
-### Especificação ###
+### Comandos ###
 
 - Entrar nas pastas: 
    cd Controle-de-estoque
@@ -12,6 +12,7 @@
    javac -d ../bin -sourcepath . -cp ../bin -encoding UTF-8 model/*.java service/*.java view/*.java
 - Para rodar:
    java -cp ../bin view.Main    
+### Especificação ###
 
 #### 1. **Requisitos Funcionais**:
    - O sistema deve permitir o **cadastro, edição, exclusão e consulta** das entidades principais (ex: livros, usuários, produtos, etc.).
